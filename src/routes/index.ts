@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAllUsers, addOneUser, updateOneUser, deleteOneUser } from './Users';
+import { createWallet } from './Wallets';
 
 
 // User-route
@@ -9,8 +10,12 @@ userRouter.post('/add', addOneUser);
 userRouter.put('/update', updateOneUser);
 userRouter.delete('/delete/:id', deleteOneUser);
 
+// Wallet route
+const walletRouter = Router();
+walletRouter.post('/', createWallet);
 
 // Export the base-router
 const baseRouter = Router();
 baseRouter.use('/users', userRouter);
+baseRouter.use('/wallet', walletRouter);
 export default baseRouter;
