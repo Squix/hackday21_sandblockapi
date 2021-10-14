@@ -6,6 +6,7 @@ import { paramMissingError } from '@shared/constants';
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
 import { TezosToolkit } from '@taquito/taquito';
+import { InMemorySigner } from '@taquito/signer'
 
 import {mnemonicToSeed} from 'bip39';
 
@@ -37,7 +38,46 @@ export async function createWallet(req: Request, res: Response) {
 
    const generatedKey = await generateKeys(username, 'pasà9876ug/ordoaipjvizeuohjzàiojez')
 
-    return res.status(OK).json(generatedKey);
+   tezos.setSignerProvider(await InMemorySigner.fromSecretKey(generatedKey.sk))
+
+
+    /* //on le signale à la blockchain
+
+    try {
+        const operation = await tezos.tz.activate(generatedKey.pkh, "161d907951bf5594bedb1d70bb03c938d63c22be")
+        await operation.confirmation()
+        return res.status(OK).json(generatedKey);
+      } catch (e) {
+        console.log(e)
+        return res.status(500).end()
+      } */
+      return res.status(OK).json(generatedKey);
+    
+
+}
+
+export async function getWalletBalance(req: Request, res: Response) {
+    
+    console.log(req.params)
+    
+    const { id } = req.params;
+    if (!id) {
+        return res.status(BAD_REQUEST).json({
+            error: paramMissingError,
+        });
+    }
+
+   const tezos = new TezosToolkit(<string>process.env.BLOCKCHAIN_RPC_URL);
+
+   try {
+       const balance = await tezos.tz
+       .getBalance(id)
+       res.status(OK).end(`${balance.toNumber() / 1000000}`);
+   } catch (error) {
+    console.error(JSON.stringify(error))
+    res.status(500).end()
+   }
+  
 
 }
 

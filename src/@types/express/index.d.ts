@@ -4,7 +4,8 @@ declare module 'express' {
     export interface Request  {
         body: {
             user: IUser,
-            username: string
+            username: string,
+            user_public_key:string
         };
     }
 }

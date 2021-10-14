@@ -60,6 +60,7 @@
     "build.ts"
   ],
   "dependencies": {
+    "@taquito/signer": "^10.2.0",
     "@taquito/taquito": "^10.2.0",
     "bip39": "^3.0.4",
     "bs58check": "^2.1.2",

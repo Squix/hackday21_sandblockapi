@@ -4,7 +4,7 @@ export const b58cencode = (
     payload: Uint8Array,
     prefixArg: Uint8Array,
   ): string => {
-      console.log('prefixArg', prefixArg)
+      //console.log('prefixArg', prefixArg)
     const n = new Uint8Array(prefixArg.length + payload.length);
     n.set(prefixArg);
     n.set(payload, prefixArg.length);
