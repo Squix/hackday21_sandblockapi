@@ -3,7 +3,7 @@ import { Response } from 'express';
 
 import logger from '@shared/Logger';
 import { Address, NFTFactory } from '../nft/contract';
-import { admin_passphrase, contract } from 'src/utilities/constants';
+import { admin_passphrase, contract } from '../utilities/constants';
 import { paramMissingError } from '@shared/constants';
 
 const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
