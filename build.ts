@@ -22,6 +22,8 @@ logger.timestamp = false;
         await copy('./src/views', './dist/views');
         // Copy production env file
         await copy('./src/pre-start/env/production.env', './dist/pre-start/env/production.env');
+        //copy contract files
+        await copy('./src/nft/contract.tz', './dist/nft/contract.tz');
         // Copy back-end files
         await exec('tsc --build tsconfig.prod.json', './')
     } catch (err) {
