@@ -9,7 +9,7 @@ import 'express-async-errors';
 
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
-import { JsonDB } from 'node-json-db';
+//import JsonDB from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig';
 
 const app = express();
@@ -48,8 +48,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 //init db
-const db = new JsonDB(new Config("db", true, false, '/'));
-
+//const db = new JsonDB(new Config("db", true, false, '/'));
+const db = <any>{}
 
 // Export express instance
 export {app, db};
