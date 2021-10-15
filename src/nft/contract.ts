@@ -7,7 +7,6 @@ import { InMemorySigner } from '@taquito/signer'
 import { BigNumber } from 'bignumber.js'
 import { tzip12, Tzip12Module } from '@taquito/tzip12'
 import { bytes2Char, char2Bytes } from '@taquito/utils'
-import { config } from 'yargs'
 
 export type TokenId = number
 export type Address = string
@@ -18,18 +17,17 @@ type Contract = ContractAbstraction<ContractProvider>
 type Ctx = {
   toolkit: TezosToolkit
   address: Address
-  lambdaContractAddress: Address | undefined
 }
 
 type CtxWithContract = Ctx & {
   contract: Contract
+  lambdaContractAddress: Address | undefined
 }
 
 type OriginateContract = (ownerAddress: string) => Promise<Contract>
 const originateContract = (ctx: Ctx): OriginateContract => async (ownerAddress: string) => {
 
-  // const code: string = (await promisify(fs.readFile)(path.join(__dirname, "../../ligo/out/contract.tz"))).toString()
-  const code: string = (await promisify(fs.readFile)(path.join(__dirname, "../ligo/out/contract.tz"))).toString()
+  const code: string = (await promisify(fs.readFile)(path.join(__dirname, "./contract.tz"))).toString()
 
   const metadata = new MichelsonMap<string, Bytes>()
   metadata.set("", char2Bytes("tezos-storage:contents"))
@@ -170,10 +168,12 @@ export type NTFContract<T> = {
 }
 
 export type NFTFactory<T> = {
+  /** Create the lambda contract (used by balanceOf) */
+  createLambdaContract: () => Promise<Address>
   /** Create the NFT contract (on the blockchain), in which the tokens will be manipulated */
   originateContract: OriginateContract
   /** Create a NFT instance, for a given contract */
-  withContract: (contractAddress: Address) => Promise<NTFContract<T>>
+  withContract: (contractAddress: Address, lambdaContractAddress: Address) => Promise<NTFContract<T>>
 }
 
 export type Config = {
@@ -191,26 +191,27 @@ export const NFTFactory = {
     toolkit.setPackerProvider(new MichelCodecPacker());
     toolkit.setSignerProvider(await InMemorySigner.fromSecretKey(config.secretKey))
 
-    let lambdaContractAddress: Address | undefined
-    const op = await toolkit.contract.originate({
-      code: VIEW_LAMBDA.code,
-      storage: VIEW_LAMBDA.storage,
-    });
-    const lambdaContract = await op.contract();
-    lambdaContractAddress = lambdaContract.address;
     const ctx = {
       toolkit: toolkit,
       address: config.address,
-      lambdaContractAddress: lambdaContractAddress,
     }
 
     return {
       originateContract: originateContract(ctx),
-      withContract: async (contractAddress: Address): Promise<NTFContract<T>> => {
+      createLambdaContract: async (): Promise<Address> => {
+        const op = await toolkit.contract.originate({
+          code: VIEW_LAMBDA.code,
+          storage: VIEW_LAMBDA.storage,
+        })
+        const lambdaContract = await op.contract()
+        return lambdaContract.address
+      },
+      withContract: async (contractAddress: Address, lambdaContractAddress: Address): Promise<NTFContract<T>> => {
         const contract: Contract = await toolkit.contract.at(contractAddress, tzip12)
         const ctxWithContract = {
           ...ctx,
           contract: contract,
+          lambdaContractAddress,
         }
         return {
           mint: mint(ctxWithContract),

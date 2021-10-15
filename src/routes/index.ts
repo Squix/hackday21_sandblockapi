@@ -14,8 +14,8 @@ const contractRouter = Router();
 contractRouter.post('/admin/create-contract', createContract)
 contractRouter.post('/admin/create-token', createToken)
 contractRouter.post('/transfer', transfertToken)
-contractRouter.get('/info', getTokenInfo)
-contractRouter.get('/tokens', getTokens)
+contractRouter.get('/info/:tokenId', getTokenInfo)
+contractRouter.get('/tokens/:address', getTokens)
 
 const nftRouter = Router();
 nftRouter.post('/request', requestNft)
