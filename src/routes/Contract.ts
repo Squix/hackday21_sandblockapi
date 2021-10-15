@@ -29,12 +29,9 @@ export async function createContract(req: any, res: Response) {
   return res.status(CREATED).json({address: contract.address});
 }
 
-const contractAddress = ''
-const getFactoryWithContract = async (address: Address, secretKey: string) => NFTFactory.createWithContract({
-  providerUrl: <string>process.env.BLOCKCHAIN_RPC_URL,
-  address,
-  secretKey,
-}, contractAddress)
+const contractAddress = <string>process.env.CONTRACT_ADDRESS
+const getFactoryWithContract = async (address: Address, secretKey: string) =>
+  (await getFactory(address, secretKey)).withContract(contractAddress)
 
 const getFactoryWithContractForAdmin = () => getFactoryWithContract(admin.address, admin.secretKey)
 

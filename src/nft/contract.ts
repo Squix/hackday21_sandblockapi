@@ -183,12 +183,6 @@ export type Config = {
 }
 export const NFTFactory = {
 
-  createWithContract: async <T>(config: Config, contractAddress: Address) => {
-    const factory = await NFTFactory.create(config)
-    const contract = await factory.withContract(contractAddress)
-    return { factory, contract }
-  },
-
   /** Create a NFTFactory instance for a given blockchain address and a given account */
   create: async <T>(config: Config): Promise<NFTFactory<T>> => {
 
