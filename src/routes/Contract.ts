@@ -40,7 +40,7 @@ export async function createToken(req: any, res: Response) {
   if (passphrase !== 'thisismyadminpassphrase') {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
-  const { contract } = await getFactoryWithContractForAdmin()
+  const contract = await getFactoryWithContractForAdmin()
   const tokenId = await contract.mint(metadata, ownerAddress)
 
   return res.status(CREATED).json({tokenId});
@@ -48,7 +48,7 @@ export async function createToken(req: any, res: Response) {
 
 export async function transfertToken(req: any, res: Response) {
   const { address, secretKey, tokenId, to } = req.body
-  const { contract } = await getFactoryWithContract(address, secretKey)
+  const contract = await getFactoryWithContract(address, secretKey)
   await contract.transfer([{owner: address, tokens: [{tokenId, to}]}])
 
   return res.status(OK).json({ok: true});
@@ -56,7 +56,7 @@ export async function transfertToken(req: any, res: Response) {
 
 export async function getTokenInfo(req: any, res: Response) {
   const { tokenId } = req.body
-  const { contract } = await getFactoryWithContractForAdmin()
+  const contract = await getFactoryWithContractForAdmin()
   const tokenInfo = await contract.getTokenInfo(tokenId)
   const owner = contract.getOwner(tokenId)
 
@@ -65,7 +65,7 @@ export async function getTokenInfo(req: any, res: Response) {
 
 export async function getTokens(req: any, res: Response) {
   const { address } = req.body
-  const { contract } = await getFactoryWithContractForAdmin()
+  const contract = await getFactoryWithContractForAdmin()
   const tokenIds = await contract.getOwnedTokens(address)
 
   const tokenInfos = Promise.all(tokenIds.sort((a, b) => a - b).map(contract.getTokenInfo))
