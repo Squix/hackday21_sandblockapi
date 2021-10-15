@@ -2,34 +2,37 @@ import StatusCodes from 'http-status-codes';
 import { Response } from 'express';
 
 import { Address, NFTFactory } from '../nft/contract';
+import { admin_passphrase, contract } from 'src/utilities/constants';
 
 const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
 
 const admin = {
-  address: <string>process.env.ADMIN_ADDRESS,
-  secretKey: <string>process.env.ADMIN_SECRET_KEY
+  address: contract.ADMIN_ADDRESS,
+  secretKey: contract.ADMIN_SECRET_KEY
 }
 
 const getFactory = (address: Address, secretKey: string) => NFTFactory.create({
   providerUrl: <string>process.env.BLOCKCHAIN_RPC_URL,
-  address,
-  secretKey,
+  address:admin.address,
+  secretKey:admin.secretKey,
 })
 
 const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey)
 
 export async function createContract(req: any, res: Response) {
   const { passphrase } = req.body
-  if (passphrase !== 'thisismyadminpassphrase') {
+  if (passphrase !== admin_passphrase) {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
-  const factory = await getFactoryForAdmin()
+  console.log('coucou')
+  const factory = await getFactory(admin.address, admin.secretKey)
+  console.log("hello")
   const contract = await factory.originateContract(admin.address)
 
-  return res.status(CREATED).json({address: contract.address});
+  //return res.status(CREATED).json({address: contract.address});
 }
 
-const contractAddress = <string>process.env.CONTRACT_ADDRESS
+const contractAddress = contract.CONTRACT_ADDRESS
 const getFactoryWithContract = async (address: Address, secretKey: string) =>
   (await getFactory(address, secretKey)).withContract(contractAddress)
 
@@ -37,7 +40,7 @@ const getFactoryWithContractForAdmin = () => getFactoryWithContract(admin.addres
 
 export async function createToken(req: any, res: Response) {
   const { passphrase, metadata, ownerAddress } = req.body
-  if (passphrase !== 'thisismyadminpassphrase') {
+  if (passphrase !== admin_passphrase) {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
   const contract = await getFactoryWithContractForAdmin()
