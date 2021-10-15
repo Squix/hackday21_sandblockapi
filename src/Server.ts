@@ -9,6 +9,8 @@ import 'express-async-errors';
 
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
+import { JsonDB } from 'node-json-db';
+import { Config } from 'node-json-db/dist/lib/JsonDBConfig';
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
@@ -45,9 +47,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-
-
+//init db
+const db = new JsonDB(new Config("db", true, false, '/'));
 
 
 // Export express instance
-export default app;
+export {app, db};
