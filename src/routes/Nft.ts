@@ -11,7 +11,7 @@ import { InMemorySigner } from '@taquito/signer'
 import { db } from '@server';
 import logger from '@shared/Logger';
 
-import { contract } from "src/utilities/constants"
+import { contract } from "../utilities/constants"
 
 
 //get a nft
