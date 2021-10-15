@@ -3,29 +3,32 @@ import { Response } from 'express';
 
 import logger from '@shared/Logger';
 import { Address, NFTFactory } from '../nft/contract';
+import { admin_passphrase, contract } from 'src/utilities/constants';
 
 const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
 
 const admin = {
-  address: <string>process.env.ADMIN_ADDRESS,
-  secretKey: <string>process.env.ADMIN_SECRET_KEY
+  address: contract.ADMIN_ADDRESS,
+  secretKey: contract.ADMIN_SECRET_KEY
 }
 
 const getFactory = (address: Address, secretKey: string) => NFTFactory.create({
   providerUrl: <string>process.env.BLOCKCHAIN_RPC_URL,
-  address,
-  secretKey,
+  address:admin.address,
+  secretKey:admin.secretKey,
 })
 
 const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey)
 
 export async function createContract(req: any, res: Response) {
   const { passphrase } = req.body
-  if (passphrase !== 'thisismyadminpassphrase') {
+  if (passphrase !== admin_passphrase) {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
+
   const factory = await getFactoryForAdmin()
   logger.info(`Creating contract...`)
+ 
   const contract = await factory.originateContract(admin.address)
   const contractAddress = contract.address
   logger.info(`Created contract with address ${contractAddress}`)
@@ -34,9 +37,10 @@ export async function createContract(req: any, res: Response) {
   logger.info(`Created lambda with address ${lambdaContractAddress}`)
 
   return res.status(CREATED).json({contract: contractAddress, lambda: lambdaContractAddress });
+
 }
 
-const contractAddress = <string>process.env.CONTRACT_ADDRESS
+const contractAddress = contract.CONTRACT_ADDRESS
 const getFactoryWithContract = async (address: Address, secretKey: string) =>
   (await getFactory(address, secretKey)).withContract(contractAddress, <string>process.env.LAMBDA_CONTRACT_ADDRESS)
 
@@ -44,7 +48,7 @@ const getFactoryWithContractForAdmin = () => getFactoryWithContract(admin.addres
 
 export async function createToken(req: any, res: Response) {
   const { passphrase, metadata, ownerAddress } = req.body
-  if (passphrase !== 'thisismyadminpassphrase') {
+  if (passphrase !== admin_passphrase) {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
   const contract = await getFactoryWithContractForAdmin()
