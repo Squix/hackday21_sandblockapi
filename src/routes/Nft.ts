@@ -1,5 +1,6 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response } from 'express';
+import { Address, NFTFactory } from '../nft/contract';
 
 import { paramMissingError } from '@shared/constants';
 
@@ -8,9 +9,21 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer'
 import { db } from '@server';
+import logger from '@shared/Logger';
+
+import { contract } from "src/utilities/constants"
 
 
 //get a nft
+
+const getFactory = (address: Address, secretKey: string) => NFTFactory.create({
+  providerUrl: <string>process.env.BLOCKCHAIN_RPC_URL,
+  address:contract.ADMIN_ADDRESS,
+  secretKey:contract.ADMIN_SECRET_KEY,
+})
+
+const getFactoryWithContract = async (address: Address, secretKey: string) =>
+  (await getFactory(address, secretKey)).withContract(contract.CONTRACT_ADDRESS, contract.LAMBDA_CONTRACT_ADDRESS)
 
 export async function requestNft(req: Request, res: Response) {
     
@@ -34,7 +47,11 @@ export async function requestNft(req: Request, res: Response) {
     }
 
     //si c'est bon, on fait le transfer
+    const contractFact = await getFactoryWithContract(contract.CONTRACT_ADDRESS, contract.ADMIN_SECRET_KEY)
+    
+  //await contractFact.transfer([{owner: contract.ADMIN_ADDRESS, tokens: [<number>secret_table[secret].nft_address, user_public_key}]}])
 
+  
     //on 
 
     res.status(200).json({

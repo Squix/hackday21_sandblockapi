@@ -1,9 +1,10 @@
-import StatusCodes from 'http-status-codes';
+import StatusCodes, { BAD_REQUEST } from 'http-status-codes';
 import { Response } from 'express';
 
 import logger from '@shared/Logger';
 import { Address, NFTFactory } from '../nft/contract';
 import { admin_passphrase, contract } from 'src/utilities/constants';
+import { paramMissingError } from '@shared/constants';
 
 const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
 
@@ -27,6 +28,7 @@ export async function createContract(req: any, res: Response) {
   }
 
   const factory = await getFactoryForAdmin()
+  console.log("creating contract")
   logger.info(`Creating contract...`)
  
   const contract = await factory.originateContract(admin.address)
@@ -50,6 +52,11 @@ export async function createToken(req: any, res: Response) {
   const { passphrase, metadata, ownerAddress } = req.body
   if (passphrase !== admin_passphrase) {
     return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
+  }
+  if(!metadata || !ownerAddress) {
+    return res.status(BAD_REQUEST).json({
+      error: paramMissingError,
+  });
   }
   const contract = await getFactoryWithContractForAdmin()
   logger.info(`Creating token for ${ownerAddress}...`)
