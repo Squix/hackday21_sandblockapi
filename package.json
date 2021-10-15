@@ -76,6 +76,7 @@
     "libsodium-wrappers-sumo": "^0.7.9",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
+    "node-json-db": "^1.4.1",
     "pbkdf2": "^3.1.2"
   },
   "devDependencies": {

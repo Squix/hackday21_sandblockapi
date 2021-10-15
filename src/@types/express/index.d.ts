@@ -5,7 +5,8 @@ declare module 'express' {
         body: {
             user: IUser,
             username: string,
-            user_public_key:string
+            user_public_key:string,
+            secret:string
         };
     }
 }

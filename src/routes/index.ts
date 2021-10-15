@@ -1,21 +1,17 @@
 import { Router } from 'express';
-import { getAllUsers, addOneUser, updateOneUser, deleteOneUser } from './Users';
 import { createWallet, getWalletBalance } from './Wallets';
-
-
-// User-route
-const userRouter = Router();
-userRouter.get('/all', getAllUsers);
-userRouter.post('/add', addOneUser);
-userRouter.put('/update', updateOneUser);
-userRouter.delete('/delete/:id', deleteOneUser);
+import { requestNft } from './Nft';
 
 // Wallet route
 const walletRouter = Router();
 walletRouter.post('/', createWallet);
 walletRouter.get('/:id', getWalletBalance)
+
+const nftRouter = Router();
+nftRouter.post('/request', requestNft)
+
 // Export the base-router
 const baseRouter = Router();
-baseRouter.use('/users', userRouter);
 baseRouter.use('/wallet', walletRouter);
+baseRouter.use('/nft', nftRouter);
 export default baseRouter;
