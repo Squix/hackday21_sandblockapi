@@ -5,6 +5,7 @@ import logger from '@shared/Logger';
 import { Address, NFTFactory } from '../nft/contract';
 import { admin_passphrase, contract } from '../utilities/constants';
 import { paramMissingError } from '@shared/constants';
+import { walletFromUsername } from './Wallets';
 
 const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
 
@@ -30,7 +31,7 @@ export async function createContract(req: any, res: Response) {
   const factory = await getFactoryForAdmin()
   console.log("creating contract")
   logger.info(`Creating contract...`)
- 
+
   const contract = await factory.originateContract(admin.address)
   const contractAddress = contract.address
   logger.info(`Created contract with address ${contractAddress}`)
@@ -67,11 +68,12 @@ export async function createToken(req: any, res: Response) {
 }
 
 export async function transfertToken(req: any, res: Response) {
-  const { address, secretKey, tokenId, to } = req.body
+  const { username, tokenId, to } = req.body
+  const { address, secretKey } = await walletFromUsername(username)
   const contract = await getFactoryWithContract(address, secretKey)
-  logger.info(`Transfering token ${tokenId} from ${address} to ${to}...`)
+  logger.info(`Transfering token ${tokenId} from ${username} (${address}) to ${to}...`)
   await contract.transfer([{owner: address, tokens: [{tokenId, to}]}])
-  logger.info(`Transferred token ${tokenId} from ${address} to ${to}...`)
+  logger.info(`Transferred token ${tokenId} from ${username} (${address}) to ${to}...`)
 
   return res.status(OK).json({ok: true});
 }
