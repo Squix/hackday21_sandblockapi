@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import { createContract, createToken, getFromMarketplace, getTokenInfo, getTokens, transfertToken } from './Contract';
-import { requestNft } from './Nft';
-import { createWallet, getWalletBalance } from './Wallets';
+import { createContract, createToken, getFromMarketplace, getTokenInfo, getTokens, transfertToken } from './contract';
+import { requestNft } from './nft';
+import { createWallet, getWalletBalance } from './wallets';
 
 // Wallet route
 const walletRouter = Router();

@@ -79,7 +79,7 @@
         "src/shared/*"
       ],
       "@server": [
-        "src/Server"
+        "src/server"
       ]
     },
   },

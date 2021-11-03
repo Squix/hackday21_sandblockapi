@@ -2,11 +2,11 @@ import StatusCodes from 'http-status-codes'
 import { Response } from 'express'
 
 import { paramMissingError } from '@shared/constants';
-import logger from '@shared/Logger';
+import logger from '@shared/logger';
 
 import { Address, NFTFactory } from '../nft/contract'
 import { admin_passphrase, contract } from '../utilities/constants';
-import { walletFromUsername } from './Wallets';
+import { walletFromUsername } from './wallets';
 
 const admin = {
   address: contract.ADMIN_ADDRESS,
