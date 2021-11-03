@@ -1,13 +1,12 @@
-import StatusCodes, { BAD_REQUEST } from 'http-status-codes';
-import { Response } from 'express';
+import StatusCodes from 'http-status-codes'
+import { Response } from 'express'
 
-import logger from '@shared/Logger';
-import { Address, NFTFactory } from '../nft/contract';
-import { admin_passphrase, contract } from '../utilities/constants';
 import { paramMissingError } from '@shared/constants';
-import { walletFromUsername } from './Wallets';
+import logger from '@shared/Logger';
 
-const { CREATED, OK, UNAUTHORIZED } = StatusCodes;
+import { Address, NFTFactory } from '../nft/contract'
+import { admin_passphrase, contract } from '../utilities/constants';
+import { walletFromUsername } from './Wallets';
 
 const admin = {
   address: contract.ADMIN_ADDRESS,
@@ -25,7 +24,7 @@ const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey)
 export async function createContract(req: any, res: Response) {
   const { passphrase } = req.body
   if (passphrase !== admin_passphrase) {
-    return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
+    return res.status(StatusCodes.UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
 
   const factory = await getFactoryForAdmin()
@@ -39,7 +38,7 @@ export async function createContract(req: any, res: Response) {
   const lambdaContractAddress = await factory.createLambdaContract()
   logger.info(`Created lambda with address ${lambdaContractAddress}`)
 
-  return res.status(CREATED).json({contract: contractAddress, lambda: lambdaContractAddress });
+  return res.status(StatusCodes.CREATED).json({contract: contractAddress, lambda: lambdaContractAddress });
 
 }
 
@@ -52,10 +51,10 @@ const getFactoryWithContractForAdmin = () => getFactoryWithContract(admin.addres
 export async function createToken(req: any, res: Response) {
   const { passphrase, metadata, ownerAddress } = req.body
   if (passphrase !== admin_passphrase) {
-    return res.status(UNAUTHORIZED).json({error: 'Only admins can call this route'})
+    return res.status(StatusCodes.UNAUTHORIZED).json({error: 'Only admins can call this route'})
   }
   if(!metadata || !ownerAddress) {
-    return res.status(BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       error: paramMissingError,
   });
   }
@@ -64,7 +63,7 @@ export async function createToken(req: any, res: Response) {
   const tokenId = await contract.mint(metadata, ownerAddress)
   logger.info(`Created token ${tokenId} for ${ownerAddress}`)
 
-  return res.status(CREATED).json({tokenId});
+  return res.status(StatusCodes.CREATED).json({tokenId});
 }
 
 export async function getFromMarketplace(req: any, res: Response) {
@@ -84,9 +83,9 @@ export async function transfertToken(req: any, res: Response) {
   const contract = await getFactoryWithContract(address, secretKey)
   logger.info(`Transfering token ${tokenId} from ${username} (${address}) to ${to}...`)
   await contract.transfer([{owner: address, tokens: [{tokenId, to}]}])
-  logger.info(`Transferred token ${tokenId} from ${username} (${address}) to ${to}...`)
+  logger.info(`Transferred token ${tokenId} from ${username} (${address}) to ${to}`)
 
-  return res.status(OK).json({ok: true});
+  return res.status(StatusCodes.NO_CONTENT).end()
 }
 
 export async function getTokenInfo(req: any, res: Response) {
@@ -95,7 +94,7 @@ export async function getTokenInfo(req: any, res: Response) {
   const tokenInfo = await contract.getTokenInfo(tokenId)
   const owner = await contract.getOwner(tokenId)
 
-  return res.status(OK).json({ tokenInfo, owner });
+  return res.status(StatusCodes.OK).json({ tokenInfo, owner })
 }
 
 export async function getTokens(req: any, res: Response) {
@@ -108,5 +107,5 @@ export async function getTokens(req: any, res: Response) {
     tokenInfo: await contract.getTokenInfo(tokenId),
   })))
 
-  return res.status(OK).json({tokens: tokenInfos});
+  return res.status(StatusCodes.OK).json({tokens: tokenInfos})
 }
