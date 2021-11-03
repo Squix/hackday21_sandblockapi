@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { createWallet, getWalletBalance } from './Wallets';
-import { createContract, createToken, getTokenInfo, getTokens, transfertToken } from './Contract';
+
+import { createContract, createToken, getFromMarketplace, getTokenInfo, getTokens, transfertToken } from './Contract';
 import { requestNft } from './Nft';
+import { createWallet, getWalletBalance } from './Wallets';
 
 // Wallet route
 const walletRouter = Router();
@@ -14,6 +15,7 @@ const contractRouter = Router();
 contractRouter.post('/admin/create-contract', createContract)
 contractRouter.post('/admin/create-token', createToken)
 contractRouter.post('/transfer', transfertToken)
+contractRouter.post('/marketplace/get', getFromMarketplace)
 contractRouter.get('/info/:tokenId', getTokenInfo)
 contractRouter.get('/tokens/:address', getTokens)
 

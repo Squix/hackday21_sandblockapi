@@ -67,6 +67,17 @@ export async function createToken(req: any, res: Response) {
   return res.status(CREATED).json({tokenId});
 }
 
+export async function getFromMarketplace(req: any, res: Response) {
+  const { username, tokenId }: { username: string, tokenId: number } = req.body
+  const { address } = await walletFromUsername(username)
+  const contract = await getFactoryWithContractForAdmin()
+  logger.info(`Transfering token ${tokenId} from marketplace to ${address}...`)
+  await contract.transfer([{owner: admin.address, tokens: [{tokenId, to: address}]}])
+  logger.info(`Transferred token ${tokenId} from marketplace to ${address}`)
+
+  return res.status(StatusCodes.NO_CONTENT).end()
+}
+
 export async function transfertToken(req: any, res: Response) {
   const { username, tokenId, to } = req.body
   const { address, secretKey } = await walletFromUsername(username)
