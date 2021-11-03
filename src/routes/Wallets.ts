@@ -17,13 +17,13 @@ import { prefix } from '../utilities/constants';
 
 /**
  * Create a wallet
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export async function createWallet(req: Request, res: Response) {
-    
+
     const { username } = req.body;
     if (!username) {
         return res.status(BAD_REQUEST).json({
@@ -52,14 +52,14 @@ export async function createWallet(req: Request, res: Response) {
         return res.status(500).end()
       } */
       return res.status(OK).json(generatedKey);
-    
+
 
 }
 
 export async function getWalletBalance(req: Request, res: Response) {
-    
+
     console.log(req.params)
-    
+
     const { id } = req.params;
     if (!id) {
         return res.status(BAD_REQUEST).json({
@@ -77,7 +77,7 @@ export async function getWalletBalance(req: Request, res: Response) {
     console.error(JSON.stringify(error))
     res.status(500).end()
    }
-  
+
 
 }
 

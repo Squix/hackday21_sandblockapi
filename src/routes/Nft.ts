@@ -26,9 +26,9 @@ const getFactoryWithContract = async (address: Address, secretKey: string) =>
   (await getFactory(address, secretKey)).withContract(contract.CONTRACT_ADDRESS, contract.LAMBDA_CONTRACT_ADDRESS)
 
 export async function requestNft(req: Request, res: Response) {
-    
+
     console.log(req.body)
-    
+
     const { secret, user_public_key } = req.body;
     if (!secret) {
         return res.status(BAD_REQUEST).json({
@@ -48,11 +48,11 @@ export async function requestNft(req: Request, res: Response) {
 
     //si c'est bon, on fait le transfer
     const contractFact = await getFactoryWithContract(contract.CONTRACT_ADDRESS, contract.ADMIN_SECRET_KEY)
-    
+
   //await contractFact.transfer([{owner: contract.ADMIN_ADDRESS, tokens: [<number>secret_table[secret].nft_address, user_public_key}]}])
 
-  
-    //on 
+
+    //on
 
     res.status(200).json({
       "nft_address":secret_table[secret].nft_address
@@ -68,7 +68,7 @@ export async function requestNft(req: Request, res: Response) {
     console.error(JSON.stringify(error))
     res.status(500).end()
    } */
-  
+
 
 }
 

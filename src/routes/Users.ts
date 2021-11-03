@@ -11,10 +11,10 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
 /**
  * Get all users.
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export async function getAllUsers(req: Request, res: Response) {
     const users = await userDao.getAll();
@@ -24,10 +24,10 @@ export async function getAllUsers(req: Request, res: Response) {
 
 /**
  * Add one user.
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export async function addOneUser(req: Request, res: Response) {
     const { user } = req.body;
@@ -43,10 +43,10 @@ export async function addOneUser(req: Request, res: Response) {
 
 /**
  * Update one user.
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export async function updateOneUser(req: Request, res: Response) {
     const { user } = req.body;
@@ -63,10 +63,10 @@ export async function updateOneUser(req: Request, res: Response) {
 
 /**
  * Delete one user.
- * 
- * @param req 
- * @param res 
- * @returns 
+ *
+ * @param req
+ * @param res
+ * @returns
  */
 export async function deleteOneUser(req: Request, res: Response) {
     const { id } = req.params;
