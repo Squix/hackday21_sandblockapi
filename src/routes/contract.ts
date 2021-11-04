@@ -112,3 +112,15 @@ export async function getTokens(req: any, res: Response) {
 
   return res.status(StatusCodes.OK).json({tokens: tokenInfos})
 }
+
+export async function listMarketplace(req: any, res: Response) {
+  const contract = await getFactoryWithContractForAdmin()
+  const tokenIds = await contract.getOwnedTokens(admin.address)
+
+  const tokenInfos = await Promise.all(tokenIds.sort((a, b) => a - b).map(async (tokenId) => ({
+    tokenId: tokenId,
+    tokenInfo: await contract.getTokenInfo(tokenId),
+  })))
+
+  return res.status(StatusCodes.OK).json({tokens: tokenInfos})
+}

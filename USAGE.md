@@ -49,13 +49,19 @@ curl 'http://localhost:3000/contract/admin/create-marketplace-token' -d 'passphr
 
 ## Standard use
 
-### 1. Get a token from marketplace
+### 1. List marketplace tokens
+
+```sh
+curl 'http://localhost:3000/contract/marketplace/list'
+```
+
+### 2. Get a token from marketplace
 
 ```sh
 curl 'http://localhost:3000/contract/marketplace/get' -d 'username=dohzya&tokenId=1'
 ```
 
-### 2. Transfer a token to another address
+### 3. Transfer a token to another address
 
 ```sh
 # transfer to username 'manu'
