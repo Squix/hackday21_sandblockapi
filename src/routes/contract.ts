@@ -66,6 +66,10 @@ export async function createToken(req: any, res: Response) {
   return res.status(StatusCodes.CREATED).json({tokenId});
 }
 
+export async function createMarketplaceToken(req: any, res: Response) {
+  return createToken({...req, body: {...req.body, ownerAddress: admin.address}}, res)
+}
+
 export async function getFromMarketplace(req: any, res: Response) {
   const { username, tokenId }: { username: string, tokenId: number } = req.body
   const { address } = await walletFromUsername(username)
