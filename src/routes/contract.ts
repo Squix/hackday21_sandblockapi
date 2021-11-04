@@ -15,8 +15,8 @@ const admin = {
 
 const getFactory = (address: Address, secretKey: string) => NFTFactory.create({
   providerUrl: process.env.BLOCKCHAIN_RPC_URL as string,
-  address: admin.address,
-  secretKey: admin.secretKey,
+  address,
+  secretKey,
 })
 
 const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey)
