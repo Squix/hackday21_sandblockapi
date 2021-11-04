@@ -11,7 +11,7 @@ const express_1 = __importDefault(require("express"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 require("express-async-errors");
 const routes_1 = __importDefault(require("./routes"));
-const Logger_1 = __importDefault(require("@shared/Logger"));
+const logger_1 = __importDefault(require("@shared/logger"));
 const app = (0, express_1.default)();
 exports.app = app;
 const { BAD_REQUEST } = http_status_codes_1.default;
@@ -34,7 +34,7 @@ app.use('/', routes_1.default);
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {
-    Logger_1.default.err(err, true);
+    logger_1.default.err(err, true);
     return res.status(BAD_REQUEST).json({
         error: err.message,
     });

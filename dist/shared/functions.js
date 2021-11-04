@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRandomInt = exports.pErr = void 0;
-const Logger_1 = __importDefault(require("./Logger"));
+const logger_1 = __importDefault(require("./logger"));
 const pErr = (err) => {
     if (err) {
-        Logger_1.default.err(err);
+        logger_1.default.err(err);
     }
 };
 exports.pErr = pErr;

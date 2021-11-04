@@ -14,11 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requestNft = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
-const contract_1 = require("../nft/contract");
-const constants_1 = require("@shared/constants");
-const { BAD_REQUEST, CREATED, OK } = http_status_codes_1.default;
 const _server_1 = require("@server");
-const constants_2 = require("../utilities/constants");
+const constants_1 = require("@shared/constants");
+const constants_2 = require("@utilities/constants");
+const contract_1 = require("../nft/contract");
 //get a nft
 const getFactory = (address, secretKey) => contract_1.NFTFactory.create({
     providerUrl: process.env.BLOCKCHAIN_RPC_URL,
@@ -31,21 +30,21 @@ function requestNft(req, res) {
         console.log(req.body);
         const { secret, user_public_key } = req.body;
         if (!secret) {
-            return res.status(BAD_REQUEST).json({
+            return res.status(http_status_codes_1.default.BAD_REQUEST).json({
                 error: constants_1.paramMissingError,
             });
         }
         const secret_table = _server_1.db.getData('/secret_to_nft');
         console.log(secret_table);
         if (!secret_table[secret] || secret_table[secret].winner) {
-            return res.status(BAD_REQUEST).json({
+            return res.status(http_status_codes_1.default.BAD_REQUEST).json({
                 error: "secret is invalid or already used",
             });
         }
         //si c'est bon, on fait le transfer
         const contractFact = yield getFactoryWithContract(constants_2.contract.CONTRACT_ADDRESS, constants_2.contract.ADMIN_SECRET_KEY);
         //await contractFact.transfer([{owner: contract.ADMIN_ADDRESS, tokens: [<number>secret_table[secret].nft_address, user_public_key}]}])
-        //on 
+        //on
         res.status(200).json({
             "nft_address": secret_table[secret].nft_address
         });

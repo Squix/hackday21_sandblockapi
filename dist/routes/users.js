@@ -16,7 +16,6 @@ exports.deleteOneUser = exports.updateOneUser = exports.addOneUser = exports.get
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const constants_1 = require("@shared/constants");
 const userDao = {};
-const { BAD_REQUEST, CREATED, OK } = http_status_codes_1.default;
 /**
  * Get all users.
  *
@@ -27,7 +26,7 @@ const { BAD_REQUEST, CREATED, OK } = http_status_codes_1.default;
 function getAllUsers(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield userDao.getAll();
-        return res.status(OK).json({ users });
+        return res.status(http_status_codes_1.default.OK).json({ users });
     });
 }
 exports.getAllUsers = getAllUsers;
@@ -42,12 +41,12 @@ function addOneUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { user } = req.body;
         if (!user) {
-            return res.status(BAD_REQUEST).json({
+            return res.status(http_status_codes_1.default.BAD_REQUEST).json({
                 error: constants_1.paramMissingError,
             });
         }
         yield userDao.add(user);
-        return res.status(CREATED).end();
+        return res.status(http_status_codes_1.default.CREATED).end();
     });
 }
 exports.addOneUser = addOneUser;
@@ -62,13 +61,13 @@ function updateOneUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { user } = req.body;
         if (!user) {
-            return res.status(BAD_REQUEST).json({
+            return res.status(http_status_codes_1.default.BAD_REQUEST).json({
                 error: constants_1.paramMissingError,
             });
         }
         user.id = Number(user.id);
         yield userDao.update(user);
-        return res.status(OK).end();
+        return res.status(http_status_codes_1.default.OK).end();
     });
 }
 exports.updateOneUser = updateOneUser;
@@ -83,7 +82,7 @@ function deleteOneUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = req.params;
         yield userDao.delete(Number(id));
-        return res.status(OK).end();
+        return res.status(http_status_codes_1.default.OK).end();
     });
 }
 exports.deleteOneUser = deleteOneUser;

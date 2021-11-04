@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31,72 +12,90 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokens = exports.getTokenInfo = exports.transfertToken = exports.createToken = exports.createContract = void 0;
-const http_status_codes_1 = __importStar(require("http-status-codes"));
-const Logger_1 = __importDefault(require("@shared/Logger"));
+exports.getTokens = exports.getTokenInfo = exports.transfertToken = exports.getFromMarketplace = exports.createMarketplaceToken = exports.createToken = exports.createContract = void 0;
+const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const constants_1 = require("@shared/constants");
+const logger_1 = __importDefault(require("@shared/logger"));
+const constants_2 = require("@utilities/constants");
 const contract_1 = require("../nft/contract");
-const constants_1 = require("../utilities/constants");
-const constants_2 = require("@shared/constants");
-const { CREATED, OK, UNAUTHORIZED } = http_status_codes_1.default;
+const wallets_1 = require("./wallets");
 const admin = {
-    address: constants_1.contract.ADMIN_ADDRESS,
-    secretKey: constants_1.contract.ADMIN_SECRET_KEY
+    address: constants_2.contract.ADMIN_ADDRESS,
+    secretKey: constants_2.contract.ADMIN_SECRET_KEY
 };
 const getFactory = (address, secretKey) => contract_1.NFTFactory.create({
     providerUrl: process.env.BLOCKCHAIN_RPC_URL,
-    address: admin.address,
-    secretKey: admin.secretKey,
+    address,
+    secretKey,
 });
 const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey);
 function createContract(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { passphrase } = req.body;
-        if (passphrase !== constants_1.admin_passphrase) {
-            return res.status(UNAUTHORIZED).json({ error: 'Only admins can call this route' });
+        if (passphrase !== constants_2.admin_passphrase) {
+            return res.status(http_status_codes_1.default.UNAUTHORIZED).json({ error: 'Only admins can call this route' });
         }
         const factory = yield getFactoryForAdmin();
-        console.log("creating contract");
-        Logger_1.default.info(`Creating contract...`);
+        logger_1.default.info(`Creating contract...`);
         const contract = yield factory.originateContract(admin.address);
         const contractAddress = contract.address;
-        Logger_1.default.info(`Created contract with address ${contractAddress}`);
-        Logger_1.default.info(`Creating lambda...`);
+        logger_1.default.info(`Created contract with address ${contractAddress}`);
+        logger_1.default.info(`Creating lambda...`);
         const lambdaContractAddress = yield factory.createLambdaContract();
-        Logger_1.default.info(`Created lambda with address ${lambdaContractAddress}`);
-        return res.status(CREATED).json({ contract: contractAddress, lambda: lambdaContractAddress });
+        logger_1.default.info(`Created lambda with address ${lambdaContractAddress}`);
+        return res.status(http_status_codes_1.default.CREATED).json({ contract: contractAddress, lambda: lambdaContractAddress });
     });
 }
 exports.createContract = createContract;
-const contractAddress = constants_1.contract.CONTRACT_ADDRESS;
+const contractAddress = constants_2.contract.CONTRACT_ADDRESS;
 const getFactoryWithContract = (address, secretKey) => __awaiter(void 0, void 0, void 0, function* () { return (yield getFactory(address, secretKey)).withContract(contractAddress, process.env.LAMBDA_CONTRACT_ADDRESS); });
 const getFactoryWithContractForAdmin = () => getFactoryWithContract(admin.address, admin.secretKey);
 function createToken(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { passphrase, metadata, ownerAddress } = req.body;
-        if (passphrase !== constants_1.admin_passphrase) {
-            return res.status(UNAUTHORIZED).json({ error: 'Only admins can call this route' });
+        if (passphrase !== constants_2.admin_passphrase) {
+            return res.status(http_status_codes_1.default.UNAUTHORIZED).json({ error: 'Only admins can call this route' });
         }
         if (!metadata || !ownerAddress) {
-            return res.status(http_status_codes_1.BAD_REQUEST).json({
-                error: constants_2.paramMissingError,
+            return res.status(http_status_codes_1.default.BAD_REQUEST).json({
+                error: constants_1.paramMissingError,
             });
         }
         const contract = yield getFactoryWithContractForAdmin();
-        Logger_1.default.info(`Creating token for ${ownerAddress}...`);
+        logger_1.default.info(`Creating token for ${ownerAddress}...`);
         const tokenId = yield contract.mint(metadata, ownerAddress);
-        Logger_1.default.info(`Created token ${tokenId} for ${ownerAddress}`);
-        return res.status(CREATED).json({ tokenId });
+        logger_1.default.info(`Created token ${tokenId} for ${ownerAddress}`);
+        return res.status(http_status_codes_1.default.CREATED).json({ tokenId });
     });
 }
 exports.createToken = createToken;
+function createMarketplaceToken(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return createToken(Object.assign(Object.assign({}, req), { body: Object.assign(Object.assign({}, req.body), { ownerAddress: admin.address }) }), res);
+    });
+}
+exports.createMarketplaceToken = createMarketplaceToken;
+function getFromMarketplace(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { username, tokenId } = req.body;
+        const { address } = yield (0, wallets_1.walletFromUsername)(username);
+        const contract = yield getFactoryWithContractForAdmin();
+        logger_1.default.info(`Transfering token ${tokenId} from marketplace to ${address}...`);
+        yield contract.transfer([{ owner: admin.address, tokens: [{ tokenId, to: address }] }]);
+        logger_1.default.info(`Transferred token ${tokenId} from marketplace to ${address}`);
+        return res.status(http_status_codes_1.default.NO_CONTENT).end();
+    });
+}
+exports.getFromMarketplace = getFromMarketplace;
 function transfertToken(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { address, secretKey, tokenId, to } = req.body;
+        const { username, tokenId, to } = req.body;
+        const { address, secretKey } = yield (0, wallets_1.walletFromUsername)(username);
         const contract = yield getFactoryWithContract(address, secretKey);
-        Logger_1.default.info(`Transfering token ${tokenId} from ${address} to ${to}...`);
+        logger_1.default.info(`Transfering token ${tokenId} from ${username} (${address}) to ${to}...`);
         yield contract.transfer([{ owner: address, tokens: [{ tokenId, to }] }]);
-        Logger_1.default.info(`Transferred token ${tokenId} from ${address} to ${to}...`);
-        return res.status(OK).json({ ok: true });
+        logger_1.default.info(`Transferred token ${tokenId} from ${username} (${address}) to ${to}`);
+        return res.status(http_status_codes_1.default.NO_CONTENT).end();
     });
 }
 exports.transfertToken = transfertToken;
@@ -106,7 +105,7 @@ function getTokenInfo(req, res) {
         const contract = yield getFactoryWithContractForAdmin();
         const tokenInfo = yield contract.getTokenInfo(tokenId);
         const owner = yield contract.getOwner(tokenId);
-        return res.status(OK).json({ tokenInfo, owner });
+        return res.status(http_status_codes_1.default.OK).json({ tokenInfo, owner });
     });
 }
 exports.getTokenInfo = getTokenInfo;
@@ -121,7 +120,7 @@ function getTokens(req, res) {
                 tokenInfo: yield contract.getTokenInfo(tokenId),
             });
         })));
-        return res.status(OK).json({ tokens: tokenInfos });
+        return res.status(http_status_codes_1.default.OK).json({ tokens: tokenInfos });
     });
 }
 exports.getTokens = getTokens;
