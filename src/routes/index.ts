@@ -2,12 +2,13 @@ import { Router } from 'express';
 
 import { createContract, createMarketplaceToken, createToken, getFromMarketplace, getTokenInfo, getTokens, transfertToken } from './contract';
 import { requestNft } from './nft';
-import { createWallet, getWalletBalance } from './wallets';
+import { createWallet, getWalletBalance, prepareWallet } from './wallets';
 
 // Wallet route
 const walletRouter = Router();
 walletRouter.post('/', createWallet);
 walletRouter.get('/:id', getWalletBalance)
+walletRouter.post('/admin/prepare', prepareWallet)
 
 
 // Contract route
