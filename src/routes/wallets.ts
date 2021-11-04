@@ -1,3 +1,4 @@
+import { InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 import { mnemonicToSeed } from 'bip39';
 import { Request, Response } from 'express';
@@ -5,10 +6,8 @@ import StatusCodes from 'http-status-codes';
 import sodium from "libsodium-wrappers-sumo";
 
 import { paramMissingError } from '@shared/constants';
-import { prefix } from '@utilities/constants';
+import { contract, prefix } from '@utilities/constants';
 import { b58cencode } from '@utilities/crypto';
-import { InMemorySigner } from '@taquito/signer';
-
 
 export async function createWallet(req: Request, res: Response) {
   const { username } = req.body
@@ -30,7 +29,7 @@ export async function prepareWallet(req: any, res: Response) {
   const { address, amount } = req.body
 
   const tezos = new TezosToolkit(<string>process.env.BLOCKCHAIN_RPC_URL);
-  tezos.setSignerProvider(await InMemorySigner.fromSecretKey(process.env.ADMIN_SECRET_KEY as string))
+  tezos.setSignerProvider(await InMemorySigner.fromSecretKey(contract.ADMIN_SECRET_KEY))
   const operation = await tezos.wallet.transfer({ to: address, amount: Number(amount) }).send()
   await operation.confirmation()
 

@@ -3,9 +3,9 @@ import { Response } from 'express'
 
 import { paramMissingError } from '@shared/constants';
 import logger from '@shared/logger';
+import { admin_passphrase, contract } from '@utilities/constants';
 
 import { Address, NFTFactory } from '../nft/contract'
-import { admin_passphrase, contract } from '../utilities/constants';
 import { walletFromUsername } from './wallets';
 
 const admin = {
@@ -14,9 +14,9 @@ const admin = {
 }
 
 const getFactory = (address: Address, secretKey: string) => NFTFactory.create({
-  providerUrl: <string>process.env.BLOCKCHAIN_RPC_URL,
-  address:admin.address,
-  secretKey:admin.secretKey,
+  providerUrl: process.env.BLOCKCHAIN_RPC_URL as string,
+  address: admin.address,
+  secretKey: admin.secretKey,
 })
 
 const getFactoryForAdmin = () => getFactory(admin.address, admin.secretKey)
@@ -28,7 +28,6 @@ export async function createContract(req: any, res: Response) {
   }
 
   const factory = await getFactoryForAdmin()
-  console.log("creating contract")
   logger.info(`Creating contract...`)
 
   const contract = await factory.originateContract(admin.address)

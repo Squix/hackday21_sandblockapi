@@ -1,18 +1,11 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response } from 'express';
-import { Address, NFTFactory } from '../nft/contract';
 
-import { paramMissingError } from '@shared/constants';
-
-const { BAD_REQUEST, CREATED, OK } = StatusCodes;
-
-import { TezosToolkit } from '@taquito/taquito';
-import { InMemorySigner } from '@taquito/signer'
 import { db } from '@server';
-import logger from '@shared/Logger';
+import { paramMissingError } from '@shared/constants';
+import { contract } from "@utilities/constants"
 
-import { contract } from "../utilities/constants"
-
+import { Address, NFTFactory } from '../nft/contract';
 
 //get a nft
 
@@ -31,7 +24,7 @@ export async function requestNft(req: Request, res: Response) {
 
     const { secret, user_public_key } = req.body;
     if (!secret) {
-        return res.status(BAD_REQUEST).json({
+        return res.status(StatusCodes.BAD_REQUEST).json({
             error: paramMissingError,
         });
     }
@@ -41,7 +34,7 @@ export async function requestNft(req: Request, res: Response) {
     console.log(secret_table)
 
     if(!secret_table[secret] || secret_table[secret].winner) {
-      return res.status(BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         error: "secret is invalid or already used",
       });
     }
